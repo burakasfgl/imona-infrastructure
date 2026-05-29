@@ -1,17 +1,10 @@
 const http = require("http");
 
 const server = http.createServer((req, res) => {
-
-res.writeHead(200, {
-"Content-Type":"text/plain; charset=utf-8"
-});
-
-res.end("CI CD ÇALIŞIYOR");
-
+  res.writeHead(200, {  "Content-Type": "text/plain; charset=utf-8" });
+  res.end("CI CD ÇALIŞIYOR");
 });
 
 server.listen(3000, () => {
-
-console.log("Server running");
-
+  console.log("Server running on port 3000");
 });
