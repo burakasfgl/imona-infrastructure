@@ -29,11 +29,10 @@ jobs:
       - name: Build Image
         run: |
           docker build --no-cache -t imona-app ./sample-app
-          docker tag imona-app:latest 584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:latest
-
+          docker tag imona-app:latest 584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:v2
       - name: Push Image
         run: |
-          docker push 584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:latest
+          docker push 584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:v2
 
       - name: Force ECS Deployment
         run: |
