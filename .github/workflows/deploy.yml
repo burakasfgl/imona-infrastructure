@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Image
         run: |
-          docker build -t imona-app ./sample-app
+          docker build --no-cache -t imona-app ./sample-app
           docker tag imona-app:latest 584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:latest
 
       - name: Push Image
