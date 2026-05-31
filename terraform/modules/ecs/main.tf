@@ -5,6 +5,18 @@ resource "aws_ecs_cluster" "main" {
     Name = "${var.project_name}-${var.environment}-cluster"
   }
 }
+
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+
+  name = "/ecs/${var.project_name}-${var.environment}"
+
+  retention_in_days = 7
+
+}
+
+
+
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-${var.environment}-app"
   network_mode             = "awsvpc"
@@ -16,19 +28,49 @@ resource "aws_ecs_task_definition" "app" {
   execution_role_arn = var.ecs_task_execution_role_arn
 
   container_definitions = jsonencode([
-    {
-      name  = "app"
-      image = "584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:v2"
-      essential = true
+  {
+    name  = "app"
+    image = "584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:v2"
 
-      portMappings = [
-        {
-          containerPort = 3000
-          hostPort = 3000
-        }
-      ]
+    essential = true
+
+    environment = [
+
+  {
+
+    name = "MONGO_URI"
+
+    value = "mongodb+srv://admin:imona34@imona-cluster.n4ho3lm.mongodb.net/?retryWrites=true&w=majority&appName=imona-cluster"
+
+  }
+
+]
+
+    portMappings = [
+      {
+        containerPort = 3000
+        hostPort      = 3000
+      }
+    ]
+
+    logConfiguration = {
+
+      logDriver = "awslogs"
+
+      options = {
+
+        awslogs-group         = "/ecs/${var.project_name}-${var.environment}"
+
+        awslogs-region        = "eu-central-1"
+
+        awslogs-stream-prefix = "ecs"
+
+      }
+
     }
-  ])
+
+  }
+])
 }
 
 
