@@ -34,13 +34,13 @@ resource "aws_ecs_task_definition" "app" {
 
     essential = true
 
-    environment = [
+   secrets = [
 
   {
 
     name = "MONGO_URI"
 
-    value = "mongodb+srv://admin:imona34@imona-cluster.n4ho3lm.mongodb.net/?retryWrites=true&w=majority&appName=imona-cluster"
+    valueFrom = "arn:aws:secretsmanager:eu-central-1:584034201125:secret:imona/dev/mongo-1RWBJ7"
 
   }
 
