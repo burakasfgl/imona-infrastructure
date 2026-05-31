@@ -52,6 +52,41 @@ app.post("/xp", async (req,res)=>{
 
 });
 
+app.post("/mission-complete", async (req,res)=>{
+
+    const { user, mission, rewardXP } = req.body;
+
+    await db.collection("missions").insertOne({
+
+        user,
+
+        mission,
+
+        rewardXP,
+
+        completedAt:new Date()
+
+    });
+
+    await db.collection("xp").insertOne({
+
+        user,
+
+        points:rewardXP,
+
+        createdAt:new Date()
+
+    });
+
+    res.json({
+
+        message:"mission completed",
+
+        xpEarned:rewardXP
+
+    });
+
+});
 
 app.get("/leaderboard", async (req,res)=>{
 
