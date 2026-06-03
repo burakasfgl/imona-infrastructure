@@ -21,3 +21,7 @@ variable "private_app_subnet_id" {
 variable "target_group_arn" {
   type = string
 }
+
+variable "ecs_task_role_arn" {
+  type = string
+  }

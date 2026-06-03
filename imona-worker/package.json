@@ -1,0 +1,10 @@
+{
+  "name": "imona-worker",
+  "version": "1.0.0",
+  "main": "worker.js",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.800.0",
+    "mongodb": "^6.16.0",
+    "redis": "^5.0.1"
+  }
+}

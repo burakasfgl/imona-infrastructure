@@ -26,15 +26,16 @@ resource "aws_ecs_task_definition" "app" {
   memory = "512"
 
   execution_role_arn = var.ecs_task_execution_role_arn
+  task_role_arn = var.ecs_task_role_arn
 
   container_definitions = jsonencode([
   {
     name  = "app"
-    image = "584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:v2"
+    image = "584034201125.dkr.ecr.eu-central-1.amazonaws.com/imona-dev-app:v5"
 
     essential = true
 
-   secrets = [
+secrets = [
 
   {
 
@@ -42,7 +43,23 @@ resource "aws_ecs_task_definition" "app" {
 
     valueFrom = "arn:aws:secretsmanager:eu-central-1:584034201125:secret:imona/dev/mongo-1RWBJ7"
 
-  }
+  },
+
+  {
+
+    name = "REDIS_ENDPOINT"
+
+    valueFrom = "arn:aws:secretsmanager:eu-central-1:584034201125:secret:imona/dev/redis-4hE2hk"
+
+  },
+
+ {
+
+ name = "QUEUE_URL"
+
+ valueFrom = "arn:aws:secretsmanager:eu-central-1:584034201125:secret:imona/dev/sqs-url-h8LbNe"
+
+}
 
 ]
 
