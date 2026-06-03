@@ -74,6 +74,7 @@ module "redis" {
  ecs_security_group_id = module.security.ecs_security_group_id
 
 }
+
 module "sqs" {
 
  source = "../../modules/sqs"
