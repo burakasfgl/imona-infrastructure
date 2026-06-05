@@ -4,11 +4,50 @@ const express=require("express");
 
 const {MongoClient}=require("mongodb");
 
-const app=express();
 const bcrypt=require("bcrypt");
-app.use(express.json());
+
 const jwt=require("jsonwebtoken");
-function auth(req,res,next){
+
+const {
+
+ CognitoJwtVerifier
+
+}=require(
+
+ "aws-jwt-verify"
+
+);
+
+const app=express();
+
+const verifier=
+
+CognitoJwtVerifier.create({
+
+ userPoolId:
+
+ process.env.COGNITO_USER_POOL_ID,
+
+ tokenUse:
+
+ "access",
+
+ clientId:
+
+ process.env.COGNITO_CLIENT_ID
+
+});
+
+app.use(express.json());
+async function auth(
+
+ req,
+
+ res,
+
+ next
+
+){
 
  const header=
 
@@ -32,23 +71,29 @@ function auth(req,res,next){
 
  try{
 
-  const decoded=
+  const payload=
 
-  jwt.verify(
+  await verifier.verify(
 
-   token,
-
-   "supersecret"
+   token
 
   );
 
-  req.user=decoded;
+  req.user=
+
+  payload;
 
   next();
 
  }
 
- catch{
+ catch(error){
+
+  console.log(
+
+   error
+
+  );
 
   return res.status(401)
 

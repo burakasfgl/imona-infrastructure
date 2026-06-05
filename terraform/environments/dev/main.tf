@@ -85,6 +85,16 @@ module "sqs" {
 
 }
 
+module "notification_sqs" {
+
+ source = "../../modules/sqs"
+
+ project_name = "imona-notification"
+
+ environment = "dev"
+
+}
+
 module "worker" {
 
  source = "../../modules/worker"
@@ -108,5 +118,136 @@ module "worker" {
  security_group_id = module.security.ecs_security_group_id
 
  cluster_id = module.ecs.ecs_cluster_id
+
+}
+
+module "auth" {
+
+ source = "../../modules/auth"
+
+ project_name = "imona"
+
+ environment = "dev"
+
+ cluster_id = module.ecs.ecs_cluster_id
+
+ subnet_id = module.vpc.private_app_subnet_id
+
+ security_group_id = module.security.ecs_security_group_id
+
+ execution_role_arn = module.iam.ecs_task_execution_role_arn
+
+ task_role_arn = module.iam.ecs_task_role_arn
+
+ mongo_secret = "arn:aws:secretsmanager:eu-central-1:584034201125:secret:imona/dev/mongo-1RWBJ7"
+
+}
+
+module "notification" {
+
+ source = "../../modules/notification"
+
+ project_name = "imona"
+
+ environment = "dev"
+
+ cluster_id = module.ecs.ecs_cluster_id
+
+ subnet_id = module.vpc.private_app_subnet_id
+
+ security_group_id = module.security.ecs_security_group_id
+
+ execution_role_arn = module.iam.ecs_task_execution_role_arn
+
+ task_role_arn = module.iam.ecs_task_role_arn
+
+ queue_secret = module.sqs.queue_url
+
+}
+
+module "lambda" {
+
+ source = "../../modules/lambda"
+
+ function_name = "imona-dlq-lambda"
+
+ role_arn = "arn:aws:iam::584034201125:role/imona-dlq-lambda-role"
+
+ zip_path = "../../../imona-dlq-lambda/lambda.zip"
+
+ queue_arn = "arn:aws:sqs:eu-central-1:584034201125:imona-dev-dlq"
+
+}
+
+module "cognito" {
+
+ source = "../../modules/cognito"
+
+ project_name = "imona"
+
+ environment = "dev"
+
+}
+
+module "auth_alarm" {
+
+ source="../../modules/monitoring"
+
+ cluster_name="imona-dev-cluster"
+
+ service_name="imona-dev-auth"
+
+}
+
+module "worker_alarm" {
+
+ source = "../../modules/monitoring"
+
+ cluster_name = "imona-dev-cluster"
+
+ service_name = "imona-dev-worker"
+
+}
+
+module "notification_alarm" {
+
+ source = "../../modules/monitoring"
+
+ cluster_name = "imona-dev-cluster"
+
+ service_name = "imona-dev-notification"
+
+}
+
+module "service_alarm" {
+
+ source = "../../modules/monitoring"
+
+ cluster_name = "imona-dev-cluster"
+
+ service_name = "imona-dev-service"
+
+}
+
+module "queue_alarm" {
+
+ source = "../../modules/monitoring"
+
+ cluster_name = ""
+
+ service_name = ""
+
+ queue_name = "imona-dev-events"
+
+}
+
+
+module "dashboard" {
+
+ source = "../../modules/dashboard"
+
+ cluster_name = "imona-dev-cluster"
+
+ queue_name = "imona-dev-events"
 
 }
