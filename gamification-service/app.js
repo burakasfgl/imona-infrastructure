@@ -17,16 +17,9 @@ createClient
 }=require("redis");
 
 const {
-
-SQSClient,
-
-SendMessageCommand
-
-}=require(
-
-"@aws-sdk/client-sqs"
-
-);
+ EventBridgeClient,
+ PutEventsCommand
+}=require("@aws-sdk/client-eventbridge");
 
 const app=express();
 
@@ -68,13 +61,11 @@ createClient({
 
 });
 
-const sqs=
+const eventBridge=
 
-new SQSClient({
+new EventBridgeClient({
 
- region:
-
- "eu-central-1"
+ region:"eu-central-1"
 
 });
 
@@ -247,39 +238,61 @@ async(req,res)=>{
 
  );
 
- await sqs.send(
+console.log("sending sqs...");
 
- new SendMessageCommand({
+const result=
 
- QueueUrl:
+console.log(
 
- process.env.QUEUE_URL,
+"sending eventbridge..."
 
- MessageBody:
+);
+
+await eventBridge.send(
+
+new PutEventsCommand({
+
+ Entries:[
+
+ {
+
+ Source:
+
+ "imona.gamification",
+
+ DetailType:
+
+ "reward",
+
+ Detail:
 
  JSON.stringify({
 
-  type:
+  user:user.username,
 
-  "reward",
+  reward:"silver_badge",
 
-  user:
+  xp:user.xp
 
-  user.username,
+ }),
 
-  reward:
+ EventBusName:
 
-  "silver_badge",
+ "default"
 
-  xp:
+ }
 
-  user.xp
+ ]
 
- })
+})
 
- })
+);
 
- );
+console.log(
+
+"EVENTBRIDGE SENT"
+
+);
 
 }
 

@@ -1,3 +1,4 @@
+require("dotenv").config();
 const {
  SQSClient,
  ReceiveMessageCommand,
@@ -34,6 +35,11 @@ const queueUrl = (()=>{
 
 })();
 
+console.log(
+ "QUEUE:",
+ queueUrl
+);
+
 const mongo=new MongoClient(
 
  process.env.MONGO_URI
@@ -50,41 +56,112 @@ async function start(){
 
  await mongo.connect();
 
+try{
+
  await redisClient.connect();
 
+ console.log(
+
+  "Redis Connected"
+
+ );
+
+}
+
+catch{
+
+ console.log(
+
+  "Redis Skipped"
+
+ );
+
+}
  console.log("Worker Started");
 
  const db=mongo.db("imona");
 
  while(true){
+  console.log(
+ "polling..."
+);
 
- const response=await sqs.send(
+ const response=
 
- new ReceiveMessageCommand({
+await sqs.send(
+
+new ReceiveMessageCommand({
 
  QueueUrl:queueUrl,
 
  MaxNumberOfMessages:1,
 
- WaitTimeSeconds:20
+ WaitTimeSeconds:1,
 
- })
+ VisibilityTimeout:5
+
+})
+
+);
+
+console.log(
+
+"RESPONSE:",
+
+response
+
+);
+
+ if(
+
+ !response.Messages ||
+
+ response.Messages.length===0
+
+){
+
+ console.log(
+
+  "no messages"
 
  );
 
- if(!response.Messages){
+ continue;
 
-   continue;
+}
 
- }
+console.log(
+
+ "MESSAGE FOUND"
+
+);
 
  for(const msg of response.Messages){
 
-   const body=JSON.parse(
+   console.log(
 
-     msg.Body
+ "RAW:",
 
-   );
+ msg.Body
+
+);
+
+const event = JSON.parse(
+ msg.Body
+);
+
+console.log(
+ "EVENT RAW:",
+ event
+);
+
+const body =
+ event.detail;
+
+console.log(
+ "DETAIL:",
+ body
+);
 
    console.log(
 
@@ -104,41 +181,31 @@ async function start(){
 
    });
 
-   await db.collection("xp")
+   await db.collection("rewards")
 
-   .insertOne({
+.insertOne({
 
-    user:body.user,
+ user:body.user,
 
-    points:body.rewardXP,
+ reward:body.reward,
 
-    createdAt:new Date()
+ xp:body.xp,
 
-   });
+ createdAt:new Date()
 
-   const cacheKey=
+});
 
-   `leaderboard:${body.user}`;
+   console.log(
 
-   const current=
+ "Reward Consumed:",
 
-   await redisClient.get(
+ body.reward,
 
-    cacheKey
+ "XP:",
 
-   );
+ body.xp
 
-   await redisClient.set(
-
-    cacheKey,
-
-    Number(current||0)
-
-    +
-
-    body.rewardXP
-
-   );
+);
 
    await sqs.send(
 
