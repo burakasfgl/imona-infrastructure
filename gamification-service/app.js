@@ -17,10 +17,9 @@ createClient
 }=require("redis");
 
 const {
- EventBridgeClient,
- PutEventsCommand
-}=require("@aws-sdk/client-eventbridge");
-
+ SQSClient,
+ SendMessageCommand
+}=require("@aws-sdk/client-sqs");
 const app=express();
 
 app.use(express.json());
@@ -61,9 +60,9 @@ createClient({
 
 });
 
-const eventBridge=
+const sqs=
 
-new EventBridgeClient({
+new SQSClient({
 
  region:"eu-central-1"
 
@@ -166,11 +165,9 @@ auth,
 
 async(req,res)=>{
 
- console.log("1 auth geçti");
 
  const {action}=req.body;
 
- console.log("2 action:",action);
 
  const xp=
 
@@ -180,7 +177,6 @@ async(req,res)=>{
 
  );
 
- console.log("3 xp:",xp);
 
  await db.collection(
 
@@ -208,7 +204,6 @@ async(req,res)=>{
 
  );
 
- console.log("4 mongo update");
 
  const user=
 
@@ -224,7 +219,6 @@ async(req,res)=>{
 
  });
 
- console.log("5 user bulundu");
 
  if(
 
@@ -232,41 +226,31 @@ async(req,res)=>{
 
 ){
 
- console.log(
+console.log("sending eventbridge...");
 
- "reward unlock"
 
- );
-
-console.log("sending sqs...");
-
-const result=
 
 console.log(
 
-"sending eventbridge..."
+"sending sqs..."
 
 );
 
-await eventBridge.send(
+const result=
 
-new PutEventsCommand({
+await sqs.send(
 
- Entries:[
+new SendMessageCommand({
 
- {
+ QueueUrl:
 
- Source:
+ process.env.QUEUE_URL,
 
- "imona.gamification",
-
- DetailType:
-
- "reward",
-
- Detail:
+ MessageBody:
 
  JSON.stringify({
+
+  type:"reward",
 
   user:user.username,
 
@@ -274,15 +258,7 @@ new PutEventsCommand({
 
   xp:user.xp
 
- }),
-
- EventBusName:
-
- "default"
-
- }
-
- ]
+ })
 
 })
 
@@ -290,15 +266,17 @@ new PutEventsCommand({
 
 console.log(
 
-"EVENTBRIDGE SENT"
+"SQS SENT:",
+
+result.MessageId
 
 );
 
 }
 
-console.log("6 redis skip");
-
- console.log("7 response");
+console.log(
+"Redis Disabled"
+)
 
  res.json({
 
