@@ -103,7 +103,6 @@ terraform/
 * Cache infrastructure
 * Notification infrastructure
 
-The infrastructure layer was designed with scalability and reusability principles.
 
 
 ## Features
@@ -186,54 +185,9 @@ terraform/
 notification-service/
 ```
 
----
 
-## Setup
 
-Clone repository:
 
-```bash
-git clone <repository-url>
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run services:
-
-```bash
-node app.js
-```
-
----
-
-## Infrastructure Deployment
-
-Terraform:
-
-```bash
-terraform init
-
-terraform plan
-
-terraform apply
-```
-
----
-
-## Screenshots
-
-Add:
-
-* CloudFront Distribution Screenshot
-* AWS Infrastructure Screenshots
-* Authentication Flow
-* Architecture Diagram
-
----
 
 ## Current Status
 
@@ -250,12 +204,9 @@ Completed:
 * S3 Hosting
 * Terraform Infrastructure
 
-Work In Progress:
 
-* Extended Event Driven Flows
-* Monitoring Improvements
 
----
+
 
 ## Author
 
@@ -263,9 +214,3 @@ Burak Sofuoğlu
 
 Software Engineering Student
 
-Focused Areas:
-
-* Cloud Architecture
-* Distributed Systems
-* Backend Engineering
-* Infrastructure Automation
